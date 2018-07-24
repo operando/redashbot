@@ -97,7 +97,7 @@ Object.keys(redashApiKeysPerHost).forEach((redashHost) => {
   const redashHostAlias = redashApiKeysPerHost[redashHost]["alias"]
   const redashApiKey    = redashApiKeysPerHost[redashHost]["key"]
 
-  controller.hears(`${redashHost}/queries/([0-9]+)#([0-9]+)`, slackMessageEvents, faultTolerantMiddleware(async (bot, message) => {
+  controller.hears(`${redashHost}/queries/([0-9]+)[/source]*#([0-9]+)`, slackMessageEvents, faultTolerantMiddleware(async (bot, message) => {
     const [ originalUrl, queryId, visualizationId ] = message.match
 
     const body = await request.get({ uri: `${redashHost}/api/queries/${queryId}`, qs: { api_key: redashApiKey }, simple: true })
@@ -127,7 +127,7 @@ Object.keys(redashApiKeysPerHost).forEach((redashHost) => {
     uploadFile(message.channel, filename, output)
   }))
 
-  controller.hears(`${redashHost}/queries/([0-9]+)(?:#table)?`, slackMessageEvents, faultTolerantMiddleware(async (bot, message) => {
+  controller.hears(`${redashHost}/queries/([0-9]+)[/source]*(?:#table)?`, slackMessageEvents, faultTolerantMiddleware(async (bot, message) => {
     const [ originalUrl, queryId ] = message.match
     const body = await request.get({ uri: `${redashHost}/api/queries/${queryId}`, qs: { api_key: redashApiKey }, simple: true })
     const query = JSON.parse(body)
