@@ -3,6 +3,14 @@
   "description": "A slack bot for re:dash, it can get screen capture of re:dash visualization",
   "repository": "https://github.com/hakobera/redashbot",
   "keywords": ["re:dash", "slack", "bot"],
+  "buildpacks": [
+    {
+      "url": "heroku/nodejs"
+    },
+    {
+      "url": "https://github.com/CoffeeAndCode/puppeteer-heroku-buildpack"
+    }
+  ],
   "env": {
     "SLACK_BOT_TOKEN": {
       "description": "Slack bot token, for more detail see https://api.slack.com/bot-users",
