@@ -132,13 +132,22 @@ Object.keys(redashApiKeysPerHost).forEach((redashHost) => {
         })
         const dashboard = JSON.parse(body)
 
+        const embedUrls = {}
+        const filenames = {}
+        let replyMessage = `Taking screenshot of ${dashboardId} dashboard widgets\n`;
         for (const w of dashboard.widgets) {
             const embedUrl = `${redashHostAlias}/embed/query/${w.visualization.query.id}/visualization/${w.visualization.id}?api_key=${redashApiKey}`
             const filename = `${dashboard.name}-dashboard-${w.visualization.query.name}-${w.visualization.name}-query-${w.visualization.query.id}-visualization-${w.visualization.id}.png`
+            embedUrls[embedUrl] = embedUrl
+            filenames[embedUrl] = filename
+            replyMessage += `${redashHost}/queries/${w.visualization.query.id}/#${w.visualization.id}\n`
+        }
 
-            bot.reply(message, `Taking screenshot of ${redashHost}/queries/${w.visualization.query.id}/#${w.visualization.id} (${dashboardId} dashboard widget)`)
-            const output = await takeScreenshot(embedUrl)
-            uploadFile(message.channel, filename, output)
+        bot.reply(message, replyMessage)
+
+        for (const e in embedUrls) {
+            const output = await takeScreenshot(embedUrls[e])
+            uploadFile(message.channel, filenames[e], output)
         }
     }))
 
