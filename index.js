@@ -134,7 +134,7 @@ Object.keys(redashApiKeysPerHost).forEach((redashHost) => {
 
         const embedUrls = {}
         const filenames = {}
-        let replyMessage = `Taking screenshot of ${dashboardId} dashboard widgets\n`;
+        let replyMessage = `Taking screenshot of ${dashboard.name} dashboard widgets\n`;
         for (const w of dashboard.widgets) {
             const embedUrl = `${redashHostAlias}/embed/query/${w.visualization.query.id}/visualization/${w.visualization.id}?api_key=${redashApiKey}`
             const filename = `${dashboard.name}-dashboard-${w.visualization.query.name}-${w.visualization.name}-query-${w.visualization.query.id}-visualization-${w.visualization.id}.png`
