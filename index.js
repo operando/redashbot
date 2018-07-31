@@ -164,11 +164,13 @@ Object.keys(redashApiKeysPerHost).forEach((redashHost) => {
         })
 
         const cols = {}
+        const dashes = {}
         for (const {friendly_name} of result.columns) {
-            const dashes = '-'.repeat(friendly_name.length)
-            cols[friendly_name] = `${friendly_name}\n${dashes}`
+            cols[friendly_name] = friendly_name
+            dashes[friendly_name] = '-'.repeat(friendly_name.length)
         }
-        const table = new Table([cols].concat(rows))
+
+        const table = new Table([cols,dashes].concat(rows))
         let tableMessage = '```' + table.toString() + '```'
         tableMessage = tableMessage.split('\n').map(line => line.trimRight()).join('\n')
         bot.reply(message, `${query.name}\n${tableMessage}`)
