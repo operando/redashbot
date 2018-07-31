@@ -164,9 +164,12 @@ Object.keys(redashApiKeysPerHost).forEach((redashHost) => {
         })
 
         const cols = {}
-        const dashes = {}
         for (const {friendly_name} of result.columns) {
             cols[friendly_name] = friendly_name
+        }
+
+        const dashes = {}
+        for (const {friendly_name} of result.columns) {
             dashes[friendly_name] = '-'.repeat(friendly_name.length)
         }
 
