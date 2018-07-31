@@ -132,12 +132,14 @@ Object.keys(redashApiKeysPerHost).forEach((redashHost) => {
         })
         const dashboard = JSON.parse(body)
 
-        const filename = `${dashboard.name}-dashboard-${dashboardId}.png`
+        for (const w of dashboard.widgets) {
+            const embedUrl = `${redashHostAlias}/embed/query/${w.visualization.query.id}/visualization/${w.visualization.id}?api_key=${redashApiKey}`
+            const filename = `${dashboard.name}-dashboard-${w.visualization.query.name}-${w.visualization.name}-query-${w.visualization.query.id}-visualization-${w.visualization.id}.png`
 
-        bot.reply(message, `Taking screenshot of ${originalUrl}`)
-        bot.botkit.log(dashboard.public_url)
-        const output = await takeScreenshot(dashboard.public_url)
-        uploadFile(message.channel, filename, output)
+            bot.reply(message, `Taking screenshot of ${redashHost}/queries/${w.visualization.query.id}/#${w.visualization.id} (${dashboardId} dashboard widget)`)
+            const output = await takeScreenshot(embedUrl)
+            uploadFile(message.channel, filename, output)
+        }
     }))
 
     controller.hears(`${redashHost}/queries/([0-9]+)[/source]*(?:#table)?`, slackMessageEvents, faultTolerantMiddleware(async (bot, message) => {
