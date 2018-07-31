@@ -134,7 +134,7 @@ Object.keys(redashApiKeysPerHost).forEach((redashHost) => {
 
     const result = JSON.parse(await request.get({ uri: `${redashHost}/api/queries/${queryId}/results.json`, qs: { api_key: redashApiKey }, simple: true })).query_result.data
 
-    const rows = result.rows.map(row => {
+    const rows = result.rows.slice(0, 10).map(row => {
       const converted = {}
       for (const { friendly_name, name } of result.columns) {
         converted[friendly_name] = row[name]
