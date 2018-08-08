@@ -88,12 +88,13 @@ const takeScreenshot = async (url) => {
     return file
 }
 
-const uploadFile = async (channel, filename, file) => {
+const uploadFile = async (channel, filename, file, initialComment) => {
     const options = {
         token: slackBotToken,
         filename: filename,
         file: fs.createReadStream(file),
-        channels: channel
+        channels: channel,
+        initial_comment: initialComment
     }
     await request.post({url: "https://api.slack.com/api/files.upload", formData: options, simple: true})
 }
@@ -115,11 +116,11 @@ Object.keys(redashApiKeysPerHost).forEach((redashHost) => {
 
         const embedUrl = `${redashHostAlias}/embed/query/${queryId}/visualization/${visualizationId}?api_key=${redashApiKey}`
         const filename = `${query.name}-${visualization.name}-query-${queryId}-visualization-${visualizationId}.png`
+        const initialComment = `Query URL : ${originalUrl}`
 
-        bot.reply(message, `Taking screenshot of ${originalUrl}`)
         bot.botkit.log(embedUrl)
         const output = await takeScreenshot(embedUrl)
-        uploadFile(message.channel, filename, output)
+        uploadFile(message.channel, filename, output, initialComment)
     }))
 
     controller.hears(`${redashHost}/dashboard/([^?/|>]+)`, slackMessageEvents, faultTolerantMiddleware(async (bot, message) => {
@@ -133,21 +134,21 @@ Object.keys(redashApiKeysPerHost).forEach((redashHost) => {
         const dashboard = JSON.parse(body)
 
         const embedUrls = {}
-        const filenames = {}
-        let replyMessage = `Taking screenshot of ${dashboard.name} dashboard widgets\n`;
+        const fileNames = {}
+        const queryUrl = {}
         for (const w of dashboard.widgets) {
             const embedUrl = `${redashHostAlias}/embed/query/${w.visualization.query.id}/visualization/${w.visualization.id}?api_key=${redashApiKey}`
             const filename = `${dashboard.name}-dashboard-${w.visualization.query.name}-${w.visualization.name}-query-${w.visualization.query.id}-visualization-${w.visualization.id}.png`
             embedUrls[embedUrl] = embedUrl
-            filenames[embedUrl] = filename
-            replyMessage += `${redashHost}/queries/${w.visualization.query.id}/#${w.visualization.id}\n`
+            fileNames[embedUrl] = filename
+            queryUrl[embedUrl] = `Query URL : ${redashHost}/queries/${w.visualization.query.id}/#${w.visualization.id}`
         }
 
-        bot.reply(message, replyMessage)
+        bot.reply(message, "Hi!")
 
         for (const e in embedUrls) {
             const output = await takeScreenshot(embedUrls[e])
-            uploadFile(message.channel, filenames[e], output)
+            uploadFile(message.channel, fileNames[e], output, queryUrl[e])
         }
     }))
 
