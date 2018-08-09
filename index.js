@@ -116,7 +116,7 @@ Object.keys(redashApiKeysPerHost).forEach((redashHost) => {
 
         const embedUrl = `${redashHostAlias}/embed/query/${queryId}/visualization/${visualizationId}?api_key=${redashApiKey}`
         const filename = `${query.name}-${visualization.name}-query-${queryId}-visualization-${visualizationId}.png`
-        const initialComment = `Query URL : ${originalUrl}`
+        const initialComment = `*${query.name}*\nQuery URL : ${originalUrl}`
 
         bot.botkit.log(embedUrl)
         const output = await takeScreenshot(embedUrl)
@@ -141,7 +141,7 @@ Object.keys(redashApiKeysPerHost).forEach((redashHost) => {
             const filename = `${dashboard.name}-dashboard-${w.visualization.query.name}-${w.visualization.name}-query-${w.visualization.query.id}-visualization-${w.visualization.id}.png`
             embedUrls[embedUrl] = embedUrl
             fileNames[embedUrl] = filename
-            queryUrl[embedUrl] = `Query URL : ${redashHost}/queries/${w.visualization.query.id}/#${w.visualization.id}`
+            queryUrl[embedUrl] = `*${w.visualization.query.name}*\nQuery URL : ${redashHost}/queries/${w.visualization.query.id}/#${w.visualization.id}`
         }
 
         bot.reply(message, "Hi!")
@@ -188,6 +188,6 @@ Object.keys(redashApiKeysPerHost).forEach((redashHost) => {
         const table = new Table([cols, dashes].concat(rows), {maxWidth: 2000})
         let tableMessage = '```' + table.toString() + '```'
         tableMessage = tableMessage.split('\n').map(line => line.trimRight()).join('\n')
-        bot.reply(message, `${query.name}\n${tableMessage}`)
+        bot.reply(message, `*${query.name}*\n${tableMessage}`)
     }))
 })
