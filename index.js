@@ -152,7 +152,7 @@ Object.keys(redashApiKeysPerHost).forEach((redashHost) => {
         }
     }))
 
-    controller.hears(`${redashHost}/queries/([0-9]+)[/source]*(?:#table-all)?`, slackMessageEvents, faultTolerantMiddleware(async (bot, message) => {
+    controller.hears(`${redashHost}/queries/([0-9]+)[/source]*#table-all?`, slackMessageEvents, faultTolerantMiddleware(async (bot, message) => {
         const [originalUrl, queryId] = message.match
         const body = await request.get({
             uri: `${redashHost}/api/queries/${queryId}`,
