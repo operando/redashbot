@@ -57,7 +57,8 @@ const controller = Botkit.slackbot({
 })
 
 controller.spawn({
-    token: slackBotToken
+    token: slackBotToken,
+    retry: Infinity
 }).startRTM()
 
 const faultTolerantMiddleware = (func) => {
