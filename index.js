@@ -192,6 +192,45 @@ Object.keys(redashApiKeysPerHost).forEach((redashHost) => {
         bot.reply(message, `*${query.name}*\n${tableMessage}`)
     }))
 
+    controller.hears(`${redashHost}/queries/([0-9]+)[/source]*#table-([0-9]+)?`, slackMessageEvents, faultTolerantMiddleware(async (bot, message) => {
+        const [originalUrl, queryId, limit] = message.match
+        const body = await request.get({
+            uri: `${redashHost}/api/queries/${queryId}`,
+            qs: {api_key: redashApiKey},
+            simple: true
+        })
+        const query = JSON.parse(body)
+
+        const result = JSON.parse(await request.get({
+            uri: `${redashHost}/api/queries/${queryId}/results.json`,
+            qs: {api_key: redashApiKey},
+            simple: true
+        })).query_result.data
+
+        const rows = result.rows.slice(0, limit).map(row => {
+            const converted = {}
+            for (const {friendly_name, name} of result.columns) {
+                converted[friendly_name] = row[name]
+            }
+            return converted
+        })
+
+        const cols = {}
+        for (const {friendly_name} of result.columns) {
+            cols[friendly_name] = friendly_name
+        }
+
+        const dashes = {}
+        for (const {friendly_name} of result.columns) {
+            dashes[friendly_name] = '-'.repeat(friendly_name.length)
+        }
+
+        const table = new Table([cols, dashes].concat(rows), {maxWidth: 2000})
+        let tableMessage = '```' + table.toString() + '```'
+        tableMessage = tableMessage.split('\n').map(line => line.trimRight()).join('\n')
+        bot.reply(message, `*${query.name}*\n${tableMessage}`)
+    }))
+
     controller.hears(`${redashHost}/queries/([0-9]+)[/source]*(?:#table)?`, slackMessageEvents, faultTolerantMiddleware(async (bot, message) => {
         const [originalUrl, queryId] = message.match
         const body = await request.get({
