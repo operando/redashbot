@@ -137,6 +137,15 @@ Object.keys(redashApiKeysPerHost).forEach((redashHost) => {
         const embedUrls = {}
         const fileNames = {}
         const queryUrl = {}
+
+        dashboard.widgets.sort((a, b) => {
+            if (a.options.position.row > b.options.position.row) return 1;
+            if (a.options.position.row < b.options.position.row) return -1;
+            if (a.options.position.col > b.options.position.col) return 1;
+            if (a.options.position.col < b.options.position.col) return -1;
+            return 0;
+        })
+
         for (const w of dashboard.widgets) {
             const embedUrl = `${redashHostAlias}/embed/query/${w.visualization.query.id}/visualization/${w.visualization.id}?api_key=${redashApiKey}`
             const filename = `${dashboard.name}-dashboard-${w.visualization.query.name}-${w.visualization.name}-query-${w.visualization.query.id}-visualization-${w.visualization.id}.png`
