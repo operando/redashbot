@@ -121,6 +121,12 @@ Object.keys(redashApiKeysPerHost).forEach((redashHost) => {
         const filename = `${query.name}-${visualization.name}-query-${queryId}-visualization-${visualizationId}.png`
         const initialComment = `*${query.name}*\nQuery URL : ${originalUrl}`
 
+        bot.api.reactions.add({
+            name: 'ok_hand',
+            channel: message.channel,
+            timestamp: message.ts
+        });
+
         bot.botkit.log(embedUrl)
         const output = await takeScreenshot(embedUrl)
         uploadFile(message.channel, filename, output, initialComment)
