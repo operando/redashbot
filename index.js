@@ -121,6 +121,8 @@ Object.keys(redashApiKeysPerHost).forEach((redashHost) => {
         const filename = `${query.name}-${visualization.name}-query-${queryId}-visualization-${visualizationId}.png`
         const initialComment = `*${query.name}*\nQuery URL : ${originalUrl}`
 
+        reactions(bot,message)
+
         bot.botkit.log(embedUrl)
         const output = await takeScreenshot(embedUrl)
         uploadFile(message.channel, filename, output, initialComment)
@@ -156,7 +158,7 @@ Object.keys(redashApiKeysPerHost).forEach((redashHost) => {
             queryUrl[embedUrl] = `*${w.visualization.query.name}*\nQuery URL : ${redashHost}/queries/${w.visualization.query.id}/#${w.visualization.id}`
         }
 
-        bot.reply(message, "Hi!")
+        reactions(bot,message)
 
         for (const e in embedUrls) {
             const output = await takeScreenshot(embedUrls[e])
@@ -197,6 +199,8 @@ Object.keys(redashApiKeysPerHost).forEach((redashHost) => {
             dashes[friendly_name] = '-'.repeat(friendly_name.length)
         }
 
+        reactions(bot,message)
+
         const table = new Table([cols, dashes].concat(rows), {maxWidth: 2000})
         let tableMessage = '```' + table.toString() + '```'
         tableMessage = tableMessage.split('\n').map(line => line.trimRight()).join('\n')
@@ -235,6 +239,8 @@ Object.keys(redashApiKeysPerHost).forEach((redashHost) => {
         for (const {friendly_name} of result.columns) {
             dashes[friendly_name] = '-'.repeat(friendly_name.length)
         }
+
+        reactions(bot,message)
 
         const table = new Table([cols, dashes].concat(rows), {maxWidth: 2000})
         let tableMessage = '```' + table.toString() + '```'
@@ -275,9 +281,19 @@ Object.keys(redashApiKeysPerHost).forEach((redashHost) => {
             dashes[friendly_name] = '-'.repeat(friendly_name.length)
         }
 
+        reactions(bot,message)
+
         const table = new Table([cols, dashes].concat(rows), {maxWidth: 2000})
         let tableMessage = '```' + table.toString() + '```'
         tableMessage = tableMessage.split('\n').map(line => line.trimRight()).join('\n')
         bot.reply(message, `*${query.name}*\n${tableMessage}`)
     }))
 })
+
+function reactions(bot, message) {
+    bot.api.reactions.add({
+        name: 'ok_hand',
+        channel: message.channel,
+        timestamp: message.ts
+    })
+}
