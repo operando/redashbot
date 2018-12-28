@@ -104,7 +104,9 @@ Object.keys(redashApiKeysPerHost).forEach((redashHost) => {
     const redashHostAlias = redashApiKeysPerHost[redashHost]["alias"]
     const redashApiKey = redashApiKeysPerHost[redashHost]["key"]
 
-    controller.hears(`${redashHost}/queries/([0-9]+)[/source]*#([0-9]+)`, slackMessageEvents, faultTolerantMiddleware(async (bot, message) => {
+    let domain = redashHost.replace("http://", "").replace("https://", "")
+
+    controller.hears(`https?://${domain}/queries/([0-9]+)[/source]*#([0-9]+)`, slackMessageEvents, faultTolerantMiddleware(async (bot, message) => {
         const [originalUrl, queryId, visualizationId] = message.match
 
         const body = await request.get({
@@ -124,7 +126,7 @@ Object.keys(redashApiKeysPerHost).forEach((redashHost) => {
         uploadFile(message.channel, filename, output, initialComment)
     }))
 
-    controller.hears(`${redashHost}/dashboard/([^?/|>]+)`, slackMessageEvents, faultTolerantMiddleware(async (bot, message) => {
+    controller.hears(`https?://${domain}/dashboard/([^?/|>]+)`, slackMessageEvents, faultTolerantMiddleware(async (bot, message) => {
         const [originalUrl, dashboardId] = message.match
 
         const body = await request.get({
@@ -162,7 +164,7 @@ Object.keys(redashApiKeysPerHost).forEach((redashHost) => {
         }
     }))
 
-    controller.hears(`${redashHost}/queries/([0-9]+)[/source]*#table-all?`, slackMessageEvents, faultTolerantMiddleware(async (bot, message) => {
+    controller.hears(`https?://${domain}/queries/([0-9]+)[/source]*#table-all?`, slackMessageEvents, faultTolerantMiddleware(async (bot, message) => {
         const [originalUrl, queryId] = message.match
         const body = await request.get({
             uri: `${redashHost}/api/queries/${queryId}`,
@@ -201,7 +203,7 @@ Object.keys(redashApiKeysPerHost).forEach((redashHost) => {
         bot.reply(message, `*${query.name}*\n${tableMessage}`)
     }))
 
-    controller.hears(`${redashHost}/queries/([0-9]+)[/source]*#table-([0-9]+)?`, slackMessageEvents, faultTolerantMiddleware(async (bot, message) => {
+    controller.hears(`https?://${domain}/queries/([0-9]+)[/source]*#table-([0-9]+)?`, slackMessageEvents, faultTolerantMiddleware(async (bot, message) => {
         const [originalUrl, queryId, limit] = message.match
         const body = await request.get({
             uri: `${redashHost}/api/queries/${queryId}`,
@@ -240,7 +242,7 @@ Object.keys(redashApiKeysPerHost).forEach((redashHost) => {
         bot.reply(message, `*${query.name}*\n${tableMessage}`)
     }))
 
-    controller.hears(`${redashHost}/queries/([0-9]+)[/source]*(?:#table)?`, slackMessageEvents, faultTolerantMiddleware(async (bot, message) => {
+    controller.hears(`https?://${domain}/queries/([0-9]+)[/source]*(?:#table)?`, slackMessageEvents, faultTolerantMiddleware(async (bot, message) => {
         const [originalUrl, queryId] = message.match
         const body = await request.get({
             uri: `${redashHost}/api/queries/${queryId}`,
