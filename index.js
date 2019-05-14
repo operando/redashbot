@@ -10,7 +10,7 @@ const Table = require('table-layout')
 
 
 // This configuration can gets overwritten when process.env.SLACK_MESSAGE_EVENTS is given.
-const DEFAULT_SLACK_MESSAGE_EVENTS = "direct_message,direct_mention,mention"
+const DEFAULT_SLACK_MESSAGE_EVENTS = "direct_message,direct_mention,mention,bot_message"
 
 if (!process.env.SLACK_BOT_TOKEN) {
     console.error("Error: Specify SLACK_BOT_TOKEN in environment values")
