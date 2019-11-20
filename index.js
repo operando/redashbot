@@ -150,13 +150,15 @@ Object.keys(redashApiKeysPerHost).forEach((redashHost) => {
             return 0;
         })
 
-        for (const w of dashboard.widgets) {
-            const embedUrl = `${redashHostAlias}/embed/query/${w.visualization.query.id}/visualization/${w.visualization.id}?api_key=${redashApiKey}`
-            const filename = `${dashboard.name}-dashboard-${w.visualization.query.name}-${w.visualization.name}-query-${w.visualization.query.id}-visualization-${w.visualization.id}.png`
-            embedUrls[embedUrl] = embedUrl
-            fileNames[embedUrl] = filename
-            queryUrl[embedUrl] = `*${w.visualization.query.name}*\nQuery URL : ${redashHost}/queries/${w.visualization.query.id}/#${w.visualization.id}`
-        }
+        dashboard.widgets
+            .filter(w => w.visualization != null)
+            .forEach(w => {
+                const embedUrl = `${redashHostAlias}/embed/query/${w.visualization.query.id}/visualization/${w.visualization.id}?api_key=${redashApiKey}`
+                const filename = `${dashboard.name}-dashboard-${w.visualization.query.name}-${w.visualization.name}-query-${w.visualization.query.id}-visualization-${w.visualization.id}.png`
+                embedUrls[embedUrl] = embedUrl
+                fileNames[embedUrl] = filename
+                queryUrl[embedUrl] = `*${w.visualization.query.name}*\nQuery URL : ${redashHost}/queries/${w.visualization.query.id}/#${w.visualization.id}`
+            })
 
         reactions(bot, message)
 
