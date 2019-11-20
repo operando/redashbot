@@ -10,7 +10,7 @@
   "dependencies": {
     "await-sleep": "0.0.1",
     "botkit": "^0.7.0",
-    "puppeteer": "^1.11.0",
+    "puppeteer": "^2.0.0",
     "request": "^2.88.0",
     "request-promise-native": "^1.0.5",
     "table-layout": "^0.4.3",
