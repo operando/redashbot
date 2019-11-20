@@ -1,6 +1,6 @@
-# Slack Bot for re:dash
+# Slack Bot for Redash
 
-This is slack bot for [re:dash](https://redash.io).
+This is slack bot for [Redash](https://redash.io).
 
 ## Features
 
@@ -15,7 +15,7 @@ This is slack bot for [re:dash](https://redash.io).
 Clone this repository, then
 
 ```bash
-$ npm install
+$ yarn install
 $ export REDASH_HOST=https://your-redash-server.example.com
 $ export REDASH_API_KEY=your-redash-api-key
 $ export SLACK_BOT_TOKEN=your-slack-bot-token
