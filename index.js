@@ -121,7 +121,7 @@ Object.keys(redashApiKeysPerHost).forEach((redashHost) => {
         const filename = `${query.name}-${visualization.name}-query-${queryId}-visualization-${visualizationId}.png`
         const initialComment = `*${query.name}*\nQuery URL : ${originalUrl}`
 
-        reactions(bot,message)
+        reactions(bot, message)
 
         bot.botkit.log(embedUrl)
         const output = await takeScreenshot(embedUrl)
@@ -158,7 +158,7 @@ Object.keys(redashApiKeysPerHost).forEach((redashHost) => {
             queryUrl[embedUrl] = `*${w.visualization.query.name}*\nQuery URL : ${redashHost}/queries/${w.visualization.query.id}/#${w.visualization.id}`
         }
 
-        reactions(bot,message)
+        reactions(bot, message)
 
         for (const e in embedUrls) {
             const output = await takeScreenshot(embedUrls[e])
@@ -199,11 +199,9 @@ Object.keys(redashApiKeysPerHost).forEach((redashHost) => {
             dashes[friendly_name] = '-'.repeat(friendly_name.length)
         }
 
-        reactions(bot,message)
+        reactions(bot, message)
 
-        const table = new Table([cols, dashes].concat(rows), {maxWidth: 2000})
-        let tableMessage = '```' + table.toString() + '```'
-        tableMessage = tableMessage.split('\n').map(line => line.trimRight()).join('\n')
+        let tableMessage = createTableMessage(cols, dashes, rows)
         bot.reply(message, `*${query.name}*\n${tableMessage}`)
     }))
 
@@ -240,11 +238,9 @@ Object.keys(redashApiKeysPerHost).forEach((redashHost) => {
             dashes[friendly_name] = '-'.repeat(friendly_name.length)
         }
 
-        reactions(bot,message)
+        reactions(bot, message)
 
-        const table = new Table([cols, dashes].concat(rows), {maxWidth: 2000})
-        let tableMessage = '```' + table.toString() + '```'
-        tableMessage = tableMessage.split('\n').map(line => line.trimRight()).join('\n')
+        let tableMessage = createTableMessage(cols, dashes, rows)
         bot.reply(message, `*${query.name}*\n${tableMessage}`)
     }))
 
@@ -281,11 +277,9 @@ Object.keys(redashApiKeysPerHost).forEach((redashHost) => {
             dashes[friendly_name] = '-'.repeat(friendly_name.length)
         }
 
-        reactions(bot,message)
+        reactions(bot, message)
 
-        const table = new Table([cols, dashes].concat(rows), {maxWidth: 2000})
-        let tableMessage = '```' + table.toString() + '```'
-        tableMessage = tableMessage.split('\n').map(line => line.trimRight()).join('\n')
+        let tableMessage = createTableMessage(cols, dashes, rows)
         bot.reply(message, `*${query.name}*\n${tableMessage}`)
     }))
 })
@@ -296,4 +290,10 @@ function reactions(bot, message) {
         channel: message.channel,
         timestamp: message.ts
     })
+}
+
+function createTableMessage(cols, dashes, rows) {
+    const table = new Table([cols, dashes].concat(rows), {maxWidth: 2000})
+    let tableMessage = '```' + table.toString() + '```'
+    return tableMessage.split('\n').map(line => line.trimRight()).join('\n')
 }
