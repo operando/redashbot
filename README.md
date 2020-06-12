@@ -4,11 +4,19 @@ This is slack bot for [Redash](https://redash.io).
 
 ## Features
 
-- Take a screen capture of visualization
-  - Bot can handle message format like `@botname <visualization URL>`
-    - example: `@redashbot https://your-redash-server.example.com/queries/1#2`
+### Take a screen capture of visualization
+
+- Bot can handle message format like `@botname <visualization URL>`
+  - example: `@redashbot https://your-redash-server.example.com/queries/1#2`
 
 ![screenshot.png](./images/screenshot.png)
+
+
+### Invite to Redash
+
+- Bot can handle message format like `@botname invite <email>`
+  - example: `@redashbot invite test@test.com`
+
 
 ## How to develop
 
@@ -38,6 +46,8 @@ Slack's Bot User Token
 
 Re:dash's URL and its API Key.
 
+If you want to use Redash invitation function, set Redash admin API Key.
+
 ## REDASH_HOST_ALIAS (optional)
 Re:dash' URL accessible from the bot.
 
@@ -61,3 +71,19 @@ Message events this bot reacts.
 Available values are listd in https://github.com/howdyai/botkit/blob/master/readme-slack.md#message-received-events
 Its default is *direct_message,direct_mention,mention*
 
+
+### RESTRICT_INVITATIONS_BY_EMAIL_DOMAIN (optional)
+
+Restrict the domains of email addresses that can be invited to redash.
+
+specify this variable like below
+
+```
+RESTRICT_INVITATIONS_BY_EMAIL_DOMAIN=@test.com
+```
+
+Separate letters with a comma(`,`), If you want to use multiple email domains.
+
+```
+RESTRICT_INVITATIONS_BY_EMAIL_DOMAIN=@test.com,@example.com
+```
