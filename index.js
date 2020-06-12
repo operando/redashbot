@@ -10,7 +10,7 @@ const Table = require('table-layout')
 
 // This configuration can gets overwritten when process.env.SLACK_MESSAGE_EVENTS is given.
 // https://botkit.ai/docs/v0/readme-slack.html#event-list
-const DEFAULT_SLACK_MESSAGE_EVENTS = "direct_message,direct_mention,mention,bot_message"
+const DEFAULT_SLACK_MESSAGE_EVENTS = "direct_message,direct_mention,mention"
 const REDASH_INVITE_SLACK_MESSAGE_EVENTS = "direct_message,direct_mention,mention"
 
 if (!process.env.SLACK_BOT_TOKEN) {
