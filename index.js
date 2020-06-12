@@ -289,15 +289,21 @@ Object.keys(redashApiKeysPerHost).forEach((redashHost) => {
 
     controller.hears(`invite (\\S+@\\S+\\.\\S+)`, REDASH_INVITE_SLACK_MESSAGE_EVENTS, faultTolerantMiddleware(async (bot, message) => {
         const [text, address] = message.match
-        const matches = address.match(/\|.*>/)
-        console.log("Matches : " + matches)
+        let mail;
+        if (address.indexOf("mailto:") !== -1) {
+            const matches = address.match(/\|.*>/)
+            console.log("address : " + address)
+            console.log("Matches : " + matches)
 
-        if (!matches) {
-            bot.reply(message, "invalid format email.")
-            return
+            if (!matches) {
+                bot.reply(message, "invalid format email.")
+                return
+            }
+            mail = matches[0].substring(1, matches[0].length - 1)
+        } else {
+            mail = address;
         }
 
-        const mail = matches[0].substring(1, matches[0].length - 1)
         console.log("Mail : " + mail)
 
         const splitEmail = mail.split("@")
