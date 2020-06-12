@@ -8,9 +8,10 @@ const request = require('request-promise-native')
 const sleep = require('await-sleep')
 const Table = require('table-layout')
 
-
 // This configuration can gets overwritten when process.env.SLACK_MESSAGE_EVENTS is given.
+// https://botkit.ai/docs/v0/readme-slack.html#event-list
 const DEFAULT_SLACK_MESSAGE_EVENTS = "direct_message,direct_mention,mention,bot_message"
+const REDASH_INVITE_SLACK_MESSAGE_EVENTS = "direct_message,direct_mention,mention"
 
 if (!process.env.SLACK_BOT_TOKEN) {
     console.error("Error: Specify SLACK_BOT_TOKEN in environment values")
@@ -51,6 +52,7 @@ const parseApiKeysPerHost = () => {
 const redashApiKeysPerHost = parseApiKeysPerHost()
 const slackBotToken = process.env.SLACK_BOT_TOKEN
 const slackMessageEvents = process.env.SLACK_MESSAGE_EVENTS || DEFAULT_SLACK_MESSAGE_EVENTS
+const RestrictInvitationsByEmailDomains = process.env.RESTRICT_INVITATIONS_BY_EMAIL_DOMAIN || undefined
 
 const controller = Botkit.slackbot({
     debug: !!process.env.DEBUG
@@ -283,6 +285,59 @@ Object.keys(redashApiKeysPerHost).forEach((redashHost) => {
 
         let tableMessage = createTableMessage(cols, dashes, rows)
         bot.reply(message, `*${query.name}*\n${tableMessage}`)
+    }))
+
+    controller.hears(`invite (\\S+@\\S+\\.\\S+)`, REDASH_INVITE_SLACK_MESSAGE_EVENTS, faultTolerantMiddleware(async (bot, message) => {
+        const [text, address] = message.match
+        const matches = address.match(/\|.*>/)
+        console.log("Matches : " + matches)
+
+        if (!matches) {
+            bot.reply(message, "invalid format email.")
+            return
+        }
+
+        const mail = matches[0].substring(1, matches[0].length - 1)
+        console.log("Mail : " + mail)
+
+        const splitEmail = mail.split("@")
+        const name = splitEmail[0]
+        const domain = splitEmail[1]
+        console.log("name : " + name)
+        console.log("domain : " + domain)
+
+        if (RestrictInvitationsByEmailDomains !== undefined) {
+            const emailDomains = RestrictInvitationsByEmailDomains.split(",").map(value => value.replace("@", "").trim())
+            if (!emailDomains.some(value => value === domain)) {
+                bot.reply(message, `The domain this email address is not allowed to invite.\n${mail}`)
+                return
+            }
+        }
+
+        try {
+            const res = await request.post({
+                uri: `${redashHost}/api/users`,
+                headers: {
+                    'Authorization': 'Key ' + redashApiKey,
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                json: {
+                    "name": name,
+                    "email": mail
+                }
+            })
+            console.log(res)
+
+            if (res.invite_link === undefined) {
+                bot.reply(message, `Sent redash invite to ${mail}.`)
+            } else {
+                bot.reply(reply, `Sent redash invite to ${mail}.\nPlease send this URL to the person you invited.\n${invite_link}`)
+            }
+        } catch (e) {
+            console.log(e)
+            bot.reply(message, `Error ${e.message}`)
+        }
     }))
 })
 
