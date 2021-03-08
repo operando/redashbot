@@ -345,6 +345,51 @@ Object.keys(redashApiKeysPerHost).forEach((redashHost) => {
             bot.reply(message, `Error ${e.message}`)
         }
     }))
+
+    controller.hears(`^job$`, REDASH_INVITE_SLACK_MESSAGE_EVENTS, faultTolerantMiddleware(async (bot, message) => {
+        const tasks = JSON.parse(await request.get({
+            uri: `${redashHost}/api/admin/queries/tasks`,
+            headers: {
+                'Authorization': 'Key ' + redashApiKey,
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            }
+        })).tasks
+        console.log(tasks)
+        const activeTaskList = tasks.filter(value => value.state === 'active' && value.query_id !== undefined);
+        if (activeTaskList.length === 0) {
+            bot.reply(message, "no active jobs.")
+            return
+        }
+        let jobMessage = 'Active job list\n============================\n';
+        for (const job of activeTaskList) {
+            const res = JSON.parse(await request.get({
+                uri: `${redashHost}/api/queries/${job.query_id}`,
+                headers: {
+                    'Authorization': 'Key ' + redashApiKey,
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                }
+            }))
+            console.log(res)
+            jobMessage += `<${redashHost}/queries/${job.query_id}|${res.name}>  job id : ${job.task_id}\n`;
+        }
+        bot.reply(message, jobMessage)
+    }))
+
+    controller.hears(`job_cancel ([0-9a-z\\-]+)`, REDASH_INVITE_SLACK_MESSAGE_EVENTS, faultTolerantMiddleware(async (bot, message) => {
+        const [text, job_id] = message.match
+        console.log(job_id)
+        await request.delete({
+            uri: `${redashHost}/api/jobs/${job_id}`,
+            headers: {
+                'Authorization': 'Key ' + redashApiKey,
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            }
+        })
+        bot.reply(message, "job canceled👋🏼")
+    }))
 })
 
 function reactions(bot, message) {
