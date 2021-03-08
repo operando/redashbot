@@ -17,6 +17,15 @@ This is slack bot for [Redash](https://redash.io).
 - Bot can handle message format like `@botname invite <email>`
   - example: `@redashbot invite test@test.com`
 
+### Show active job list
+
+- Bot can handle message format like `@botname job`
+  - example: `@redashbot job`
+
+### Cancel job
+
+- Bot can handle message format like `@botname job_cancel <job_id>`
+  - example: `@redashbot job_cancel 5130ebd3-a9ev-41a4-924d-d39fde2d4b01`
 
 ## How to develop
 
